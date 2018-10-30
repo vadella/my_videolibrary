@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>My Series</title>
+    </head>
+    <body>
+        <div class="table-responsive">
+            <table  class="table table-bordered">
+                <thead>
+                    <tr>
+                        {% for column in columns_video %}
+                            <td>{{ column }}</td>
+                        {% endfor %}
+                        {% for column in columns_audio %}
+                            <td>{{ column }}</td>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody> 
+                {% for video in query_results %}
+                <tr>
+                        {% for item in columns_video %}
+                            <td rowspan="{{ loop.length + 1}}">{{ video[item] }}</td>
+                        {% endfor %}
+                </tr>
+                    {% for audio_row in video["audio_tracks"] %}
+                        <tr>
+                            {% for audio_item in columns_audio %}
+                                <td>{{ audio_row[audio_item] }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>
