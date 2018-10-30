@@ -15,7 +15,6 @@ app = create_app()
 
 @app.route("/")
 def home():
-    # print(repr(get_data()))
     return "Hello, Flask!\n" + repr(get_data())
 
 
@@ -48,5 +47,4 @@ def get_data():
         columns_audio = ("name", "language", "codec_id", "channels")
 
         query_results = list(collection_videos.aggregate(lookup_query))
-        # print(query_results)
         return (columns_video, columns_audio, query_results)
