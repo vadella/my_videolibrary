@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>My Series</title>
+    </head>
+    <body> <table  class="table table-bordered">
+        <thead>
+            <tr>
+                {% for column in header %}
+                    {% if column not in summaries.values() %}
+                        <th> {{ column }} </th>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody> 
+        {% for video in query_results %}
+        <tr>
+            {% for item in header %}
+                {% if item in summaries %}
+                    <td title="{{video[summaries[item]]}}">{{ video[item] }}</td>
+                {% else %}
+                    {% if item not in summaries_values %}
+                        <td>{{ video[item] }}</td>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </body>
+</html>
