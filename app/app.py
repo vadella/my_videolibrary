@@ -1,7 +1,9 @@
 from flask import Flask, render_template
 import pymongo
-
+import typing
 from flask_bootstrap import Bootstrap
+
+from my_videolibrary.my_videolibrary import Movie
 
 
 def create_app():
@@ -20,31 +22,47 @@ def home():
 
 @app.route("/series/")
 def series():
-    columns_video, columns_audio, query_results = get_data()
-    return render_template(
-        "series.1.j2",
-        columns_audio=columns_audio,
-        columns_video=columns_video,
-        query_results=query_results,
-    )
+    query_results = get_data()
+    movie_summaries = [movie.summary_complete for movie in query_results]
+
+    summaries = {"audio_amount": "audio_summary", "sub_amount": "sub_summary"}
+    if movie_summaries:
+        header = list(movie_summaries[0].keys())
+        print(movie_summaries[0], header)
+        return render_template(
+            "series.1.j2",
+            query_results=movie_summaries,
+            header=header,
+            summaries=summaries,
+            summaries_values=summaries.values(),
+        )
 
 
-def get_data():
+def get_data() -> typing.Sequence[Movie]:
     with pymongo.MongoClient() as client:
         db = client.my_videos
-        collection_videos = db.videos
+        collection_movies = db.movies
         lookup_query = [
             {
                 "$lookup": {
                     "from": "audio_tracks",
-                    "localField": "video_id",
-                    "foreignField": "video_id",
+                    "localField": "movie_id",
+                    "foreignField": "movie_id",
                     "as": "audio_tracks",
                 }
-            }
+            },
+            {
+                "$lookup": {
+                    "from": "subtitle_tracks",
+                    "localField": "movie_id",
+                    "foreignField": "movie_id",
+                    "as": "subtitle_tracks",
+                }
+            },
         ]
-        columns_video = ("title", "duration")
-        columns_audio = ("name", "language", "codec_id", "channels")
 
-        query_results = list(collection_videos.aggregate(lookup_query))
-        return (columns_video, columns_audio, query_results)
+        query_results = sorted(
+            (Movie(movie) for movie in collection_movies.aggregate(lookup_query)),
+            key=lambda x: x["name"]
+        )
+        return query_results

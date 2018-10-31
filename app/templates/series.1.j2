@@ -6,28 +6,26 @@
     <table  class="table table-bordered">
         <thead>
             <tr>
-                {% for column in columns_video %}
-                    <td>{{ column }}</td>
-                {% endfor %}
-                {% for column in columns_audio %}
-                    <td>{{ column }}</td>
+                {% for column in header %}
+                    {% if column not in summaries.values() %}
+                        <th> {{ column }} </th>
+                    {% endif %}
                 {% endfor %}
             </tr>
         </thead>
         <tbody> 
         {% for video in query_results %}
-        <tr>
-                {% for item in columns_video %}
-                    <td rowspan="{{ loop.length + 1}}">{{ video[item] }}</td>
+            <tr>
+                {% for item in header %}
+                    {% if item in summaries %}
+                        <td title="{{video[summaries[item]]}}">{{ video[item] }}</td>
+                    {% else %}
+                        {% if item not in summaries_values %}
+                            <td>{{ video[item] }}</td>
+                        {% endif %}
+                    {% endif %}
                 {% endfor %}
-        </tr>
-            {% for audio_row in video["audio_tracks"] %}
-                <tr>
-                    {% for audio_item in columns_audio %}
-                        <td>{{ audio_row[audio_item] }}</td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
+            </tr>
         {% endfor %}
         </tbody>
     </table>
